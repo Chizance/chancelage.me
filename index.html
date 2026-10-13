@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chance Lage | Cloud &amp; IT Infrastructure</title>
+<meta name="description" content="Chance Lage. AWS Certified Solutions Architect. Cloud and IT infrastructure specialist with 10+ years across systems administration, networking, and security. San Francisco Bay Area.">
+<meta property="og:title" content="Chance Lage | Cloud &amp; IT Infrastructure">
+<meta property="og:description" content="AWS Certified Solutions Architect. 10+ years turning neglected IT environments into secure, documented, cloud-hosted systems.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://chancelage.me/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='17' font-weight='bold' fill='%234da3ff' text-anchor='middle'%3ECL%3C/text%3E%3C/svg%3E">
+<link rel="canonical" href="https://chancelage.me/">
+<style>
+:root{
+  --bg:#0d1117; --bg2:#131a23; --card:#161d27; --line:#242e3b;
+  --tx:#e6edf3; --tx2:#9aa8b8; --tx3:#6b7a8d;
+  --ac:#4da3ff; --ac2:#ff9f43; --ok:#3fb950;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:0 24px}
+a{color:var(--ac);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.brand{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--tx);letter-spacing:-.2px}
+.brand span{color:var(--ac)}
+.navlinks{display:flex;gap:22px;font-size:14px}
+.navlinks a{color:var(--tx2)}
+.navlinks a:hover{color:var(--tx);text-decoration:none}
+@media(max-width:640px){.navlinks{display:none}}
+
+/* hero */
+header{padding:76px 0 60px;border-bottom:1px solid var(--line);background:
+  radial-gradient(900px 380px at 12% -8%, rgba(77,163,255,.10), transparent 60%),
+  radial-gradient(700px 320px at 92% 8%, rgba(255,159,67,.07), transparent 60%)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ac);margin-bottom:18px}
+h1{font-size:clamp(34px,6vw,54px);line-height:1.08;letter-spacing:-1.4px;font-weight:700;margin-bottom:20px}
+.lede{font-size:clamp(17px,2.2vw,20px);color:var(--tx2);max-width:660px;margin-bottom:30px}
+.lede strong{color:var(--tx);font-weight:600}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
+.badge{font-family:var(--mono);font-size:12px;padding:7px 13px;border:1px solid var(--line);border-radius:100px;color:var(--tx2);background:var(--bg2)}
+.badge.live{border-color:rgba(63,185,80,.35);color:var(--ok)}
+.badge.live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:11px 20px;border-radius:7px;font-size:14.5px;font-weight:550;border:1px solid var(--line);color:var(--tx);background:var(--card);transition:.15s}
+.btn:hover{text-decoration:none;border-color:var(--ac);color:#fff}
+.btn.primary{background:var(--ac);border-color:var(--ac);color:#04121f;font-weight:650}
+.btn.primary:hover{background:#6fb6ff;border-color:#6fb6ff;color:#04121f}
+
+/* sections */
+section{padding:64px 0;border-bottom:1px solid var(--line)}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:34px}
+h2{font-size:13px;font-family:var(--mono);letter-spacing:1.8px;text-transform:uppercase;color:var(--ac);font-weight:600;white-space:nowrap}
+.shead .rule{flex:1;height:1px;background:var(--line)}
+
+/* experience */
+.job{display:grid;grid-template-columns:150px 1fr;gap:28px;padding:26px 0;border-top:1px solid var(--line)}
+.job:first-of-type{border-top:none;padding-top:0}
+.job .when{font-family:var(--mono);font-size:12.5px;color:var(--tx3);padding-top:4px}
+.job h3{font-size:18.5px;font-weight:650;letter-spacing:-.3px;margin-bottom:3px}
+.job .org{color:var(--ac2);font-size:14.5px;margin-bottom:12px;font-weight:500}
+.job ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.job li{color:var(--tx2);font-size:14.8px;padding-left:17px;position:relative}
+.job li::before{content:"▸";position:absolute;left:0;color:var(--tx3);font-size:11px;top:3px}
+.job li strong{color:var(--tx);font-weight:600}
+@media(max-width:680px){.job{grid-template-columns:1fr;gap:8px}.job .when{padding-top:0}}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:22px;transition:.15s}
+.card:hover{border-color:#31404f;transform:translateY(-2px)}
+.card h3{font-size:16.5px;font-weight:650;margin-bottom:9px;letter-spacing:-.2px}
+.card p{color:var(--tx2);font-size:14.3px;margin-bottom:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:11px;padding:3.5px 9px;background:rgba(77,163,255,.08);border:1px solid rgba(77,163,255,.18);border-radius:5px;color:#8cc4ff}
+
+/* certs */
+.cert{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.cert:first-of-type{border-top:none}
+.cert .cn{font-weight:600;font-size:15.5px}
+.cert .ci{color:var(--tx3);font-size:13.3px;font-family:var(--mono)}
+.pill{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:100px;white-space:nowrap}
+.pill.active{background:rgba(63,185,80,.11);color:var(--ok);border:1px solid rgba(63,185,80,.28)}
+.pill.past{background:rgba(154,168,184,.07);color:var(--tx3);border:1px solid var(--line)}
+
+/* stack / arch */
+.arch{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:28px;margin-top:6px}
+.arch p{color:var(--tx2);font-size:14.8px;margin-bottom:20px;max-width:640px}
+.arch svg{width:100%;height:auto;display:block}
+.archnote{font-family:var(--mono);font-size:12.5px;color:var(--tx3);margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+
+/* skills */
+.skillgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px}
+.skillcol h4{font-family:var(--mono);font-size:11.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ac2);margin-bottom:11px;font-weight:600}
+.skillcol p{color:var(--tx2);font-size:14.3px;line-height:1.85}
+
+/* contact */
+footer{padding:60px 0 70px}
+.contactgrid{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.foot{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--tx3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <div class="brand">chance<span>lage</span></div>
+  <div class="navlinks">
+    <a href="#work">Work</a><a href="#projects">Projects</a><a href="#certs">Certifications</a><a href="#stack">This Site</a><a href="#contact">Contact</a>
+  </div>
+</div></nav>
+
+<header><div class="wrap">
+  <div class="eyebrow">Cloud &amp; IT Infrastructure · San Francisco Bay Area</div>
+  <h1>I take neglected IT environments and make them secure, documented, and cloud-hosted.</h1>
+  <p class="lede">Over ten years across systems administration, networking, and security. Most recently the <strong>only IT staff member at a community mental health nonprofit of about 100 users</strong> across two San Francisco sites, where I ran an AWS-hosted clinical research platform, automated a full file-server-to-cloud migration, and rebuilt the security posture from the ground up.</p>
+  <div class="badges">
+    <span class="badge live">Open to cloud infrastructure roles</span>
+    <span class="badge">AWS Certified Solutions Architect</span>
+    <span class="badge">10+ years IT</span>
+    <span class="badge">Bay Area / Remote</span>
+  </div>
+  <div class="cta">
+    <a class="btn primary" href="#contact">Get in touch</a>
+    <a class="btn" href="resume.pdf">Download resume</a>
+    <a class="btn" href="https://github.com/Chizance" target="_blank" rel="noopener">GitHub</a>
+    <a class="btn" href="https://linkedin.com/in/chancealage" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+</div></header>
+
+<section id="work"><div class="wrap">
+  <div class="shead"><h2>Experience</h2><div class="rule"></div></div>
+
+  <div class="job">
+    <div class="when">Mar 2022 to Aug 2025</div>
+    <div>
+      <h3>IT Specialist</h3>
+      <div class="org">Homeless Children's Network · Community mental health &amp; family services · San Francisco</div>
+      <ul>
+        <li>Only IT staff member for a <strong>behavioral health nonprofit of about 100 users across two sites</strong>. Every endpoint, server, switch, vendor contract, and the IT budget.</li>
+        <li>Served as the organization's <strong>point of contact to the San Francisco Department of Public Health</strong> for the 2023 EHR migration from Avatar to Epic. Owned technical readiness and testing, and got Citrix access working across every workstation.</li>
+        <li>Deployed and administered a <strong>REDCap clinical research platform on AWS</strong> using Elastic Beanstalk, EC2, and AMI-based recovery. Included SSL certificate management, a SendGrid API integration that automated monthly survey distribution, and incident response for unauthorized access attempts.</li>
+        <li>Wrote a <strong>PowerShell migration script</strong> that moved every local user profile and shared network drive to Google Drive, retiring an aging on-premises file server along with its hardware, warranty, and backup appliance costs.</li>
+        <li>Rebuilt the security posture to satisfy <strong>cybersecurity insurance requirements</strong>: MFA across Google Workspace and Microsoft 365, enforced password standards, encrypted email for client referrals, phishing simulations, and third-party risk assessments.</li>
+        <li>Cut recurring operating costs by consolidating phone, internet, and SaaS vendors, securing nonprofit pricing tiers, and winning <strong>hardware grants that funded laptop refreshes at no cost</strong> to the organization.</li>
+        <li>Managed the lifecycle of 100+ endpoints and site networking on Ubiquiti UniFi gateways, switches, and access points, from procurement and imaging through secure decommissioning.</li>
+        <li>Introduced a ticketing system and formal IT documentation where none existed, giving leadership visibility into IT workload for the first time.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="job">
+    <div class="when">2019 to 2022</div>
+    <div>
+      <h3>Autonomous Vehicle Test Specialist</h3>
+      <div class="org">Cruise · San Francisco</div>
+      <ul>
+        <li>Monitored autonomous vehicles on live San Francisco public roads, intervening and troubleshooting in real time when systems behaved unexpectedly.</li>
+        <li>Documented vehicle behavior and edge cases for engineering teams, contributing structured field data used in safety validation.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="job">
+    <div class="when">2013 to 2019</div>
+    <div>
+      <h3>Systems Network Support Specialist</h3>
+      <div class="org">LSS of Northern California · Concord</div>
+      <ul>
+        <li>Supported 100 users across <strong>15 sites connected via MPLS and SD-WAN</strong>, handling workstation, server, and network incidents end to end.</li>
+        <li>Maintained Windows Server infrastructure and supported SQL Server database operations alongside the engineering team.</li>
+        <li>Owned IT asset management for all sites: procurement, inventory, and provisioning of workstations and network equipment.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="job">
+    <div class="when">2009 to 2013</div>
+    <div>
+      <h3>Computer Technician</h3>
+      <div class="org">Pleasanton Computer Repair · Last Chance Computers</div>
+      <ul>
+        <li>Built, diagnosed, and repaired custom desktop systems for residential and business clients. Data recovery, hardware and software troubleshooting across PC and Mac.</li>
+        <li>Set up and maintained networking equipment across residential and commercial LANs. On-call scheduling and on-site service.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section id="projects"><div class="wrap">
+  <div class="shead"><h2>Projects</h2><div class="rule"></div></div>
+  <div class="grid">
+
+    <div class="card">
+      <h3>LootCacheQR</h3>
+      <p>Smart inventory tracking built around QR codes, so you can find what you own without opening every box. Each container gets a printed code that resolves to a live list of its contents.</p>
+      <div class="tags"><span class="tag">QR codes</span><span class="tag">Inventory</span></div>
+    </div>
+    <div class="card">
+      <h3>Google Drive Migration Script</h3>
+      <p>PowerShell automation that moved every local user profile and shared network drive at an organization of about 100 users into Google Drive, allowing an aging on-premises file server to be retired entirely.</p>
+      <div class="tags"><span class="tag">PowerShell</span><span class="tag">GAM / GAMADV</span><span class="tag">Google Workspace</span></div>
+    </div>
+    <div class="card">
+      <h3>SubSniper</h3>
+      <p>A small Python tool that polls a substitute teaching job board, sends filtered phone alerts, and auto-accepts assignments matching set time and role criteria. Built in an afternoon as a favor for a friend.</p>
+      <div class="tags"><span class="tag">Python</span><span class="tag">Pushover API</span><span class="tag">Automation</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="certs"><div class="wrap">
+  <div class="shead"><h2>Certifications &amp; Education</h2><div class="rule"></div></div>
+  <div class="cert">
+    <div><div class="cn">AWS Certified Solutions Architect - Associate</div><div class="ci">Amazon Web Services · Mar 2026 to Mar 2029</div></div>
+    <span class="pill active">Active</span>
+  </div>
+  <div class="cert">
+    <div><div class="cn">Cisco Networking Academy course badge: Switching, Routing, and Wireless Essentials</div><div class="ci">CCNA curriculum · May 2020</div></div>
+    <span class="pill active">No expiry</span>
+  </div>
+  <div class="cert">
+    <div><div class="cn">CompTIA Security+</div><div class="ci">CompTIA · expired</div></div>
+    <span class="pill past">Expired</span>
+  </div>
+  <div class="cert">
+    <div><div class="cn">CompTIA Network+</div><div class="ci">CompTIA · expired</div></div>
+    <span class="pill past">Expired</span>
+  </div>
+  <div class="cert">
+    <div><div class="cn">A.S., Information and Communication Technology</div><div class="ci">Diablo Valley College · 2023</div></div>
+    <span class="pill past">Degree</span>
+  </div>
+  <div class="cert">
+    <div><div class="cn">Certificate of Achievement, Network Cybersecurity</div><div class="ci">Diablo Valley College · 2023 · Digital Forensics, CCNA Security</div></div>
+    <span class="pill past">Certificate</span>
+  </div>
+</div></section>
+
+<section id="skills"><div class="wrap">
+  <div class="shead"><h2>Technical</h2><div class="rule"></div></div>
+  <div class="skillgrid">
+    <div class="skillcol"><h4>Cloud &amp; Virtualization</h4><p>AWS: EC2, S3, IAM, VPC, Elastic Beanstalk, AMI. Cloud migration. SSL/TLS certificate management. Hyper-V and VMware.</p></div>
+    <div class="skillcol"><h4>Systems &amp; Directory</h4><p>Windows Server 2008 R2 through 2019. Windows 10/11, Ubuntu, Kali, macOS. Active Directory, Group Policy, Google Workspace Admin, Microsoft 365 Admin.</p></div>
+    <div class="skillcol"><h4>Networking</h4><p>TCP/IP, DNS, DHCP, VPN, VLAN. Firewall administration. Ubiquiti UniFi gateways, switches, access points. MPLS, SD-WAN, Wireshark, NAT and port forwarding.</p></div>
+    <div class="skillcol"><h4>Security</h4><p>MFA rollout, endpoint protection, email encryption, phishing simulation, security awareness training, cybersecurity risk assessment, HIPAA-adjacent compliance.</p></div>
+    <div class="skillcol"><h4>Automation &amp; Scripting</h4><p>PowerShell, Bash, Python. GAM and GAMADV. AI-assisted development. ConnectWise Automate, ImmyBot.</p></div>
+    <div class="skillcol"><h4>Platforms</h4><p>Microsoft 365, Google Workspace, ClickUp, ITGlue, Zoom, Adobe CC, Epic EHR via Citrix, SQL Server, TeamViewer, AnyDesk.</p></div>
+  </div>
+</div></section>
+
+<section id="stack"><div class="wrap">
+  <div class="shead"><h2>How this site is built</h2><div class="rule"></div></div>
+  <div class="arch">
+    <p>This page is not on a website builder. It runs on the same AWS primitives the Solutions Architect exam covers, defined in one CloudFormation template and deployed from the command line. That was the point.</p>
+    <svg viewBox="0 0 880 250" role="img" aria-label="Architecture diagram: Route 53 resolves the domain to CloudFront, which serves content from a private S3 bucket over TLS using an ACM certificate.">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#4da3ff"/>
+        </marker>
+        <style>
+          .bx{fill:#161d27;stroke:#31404f;stroke-width:1.4;rx:9}
+          .tl{fill:#e6edf3;font:600 14px var(--sans),sans-serif}
+          .ts{fill:#9aa8b8;font:11.5px ui-monospace,monospace}
+          .ln{stroke:#4da3ff;stroke-width:1.6;fill:none;marker-end:url(#ar)}
+          .lbl{fill:#6b7a8d;font:10.5px ui-monospace,monospace}
+        </style>
+      </defs>
+
+      <rect class="bx" x="8"   y="86" width="140" height="70"/>
+      <text class="tl" x="78"  y="115" text-anchor="middle">Visitor</text>
+      <text class="ts" x="78"  y="134" text-anchor="middle">browser</text>
+
+      <rect class="bx" x="196" y="86" width="152" height="70"/>
+      <text class="tl" x="272" y="115" text-anchor="middle">Route 53</text>
+      <text class="ts" x="272" y="134" text-anchor="middle">DNS + alias record</text>
+
+      <rect class="bx" x="396" y="86" width="164" height="70"/>
+      <text class="tl" x="478" y="115" text-anchor="middle">CloudFront</text>
+      <text class="ts" x="478" y="134" text-anchor="middle">CDN + TLS termination</text>
+
+      <rect class="bx" x="608" y="86" width="164" height="70"/>
+      <text class="tl" x="690" y="115" text-anchor="middle">S3</text>
+      <text class="ts" x="690" y="134" text-anchor="middle">private origin (OAC)</text>
+
+      <rect class="bx" x="396" y="196" width="164" height="46"/>
+      <text class="tl" x="478" y="224" text-anchor="middle" style="font-size:13px">ACM certificate</text>
+
+      <line class="ln" x1="150" y1="121" x2="190" y2="121"/>
+      <line class="ln" x1="350" y1="121" x2="390" y2="121"/>
+      <line class="ln" x1="562" y1="121" x2="602" y2="121"/>
+      <line class="ln" x1="478" y1="192" x2="478" y2="162"/>
+
+      <text class="lbl" x="170" y="112" text-anchor="middle">GET</text>
+      <text class="lbl" x="370" y="112" text-anchor="middle">alias</text>
+      <text class="lbl" x="582" y="112" text-anchor="middle">origin</text>
+
+      <text class="lbl" x="8" y="34">Request path</text>
+      <line x1="8" y1="46" x2="872" y2="46" stroke="#242e3b" stroke-width="1"/>
+    </svg>
+    <div class="archnote">
+      Route 53 hosts the zone and points alias records at the distribution. CloudFront terminates TLS with an ACM certificate, caches at edge, and adds security headers. A CloudFront Function redirects www to the apex. The S3 bucket is private, blocked from public access, and reachable only by this one distribution through an Origin Access Control policy with a SourceArn condition. Every resource is defined in a single CloudFormation template, so the whole site can be torn down and rebuilt from one command. Static content, no servers to patch, and it runs for a few dollars a month.<br><br>
+      Source: <a href="https://github.com/Chizance/chancelage.me" target="_blank" rel="noopener">github.com/Chizance/chancelage.me</a>
+    </div>
+  </div>
+</div></section>
+
+<footer id="contact"><div class="wrap">
+  <div class="shead"><h2>Contact</h2><div class="rule"></div></div>
+  <p class="lede" style="margin-bottom:0">Open to cloud infrastructure, systems engineering, and IT leadership roles in the San Francisco Bay Area or remote. Full-time or contract.</p>
+  <div class="contactgrid">
+    <a class="btn primary" href="mailto:ChanceALage@gmail.com">ChanceALage@gmail.com</a>
+    <a class="btn" href="tel:+19254088597">(925) 408-8597</a>
+    <a class="btn" href="https://linkedin.com/in/chancealage" target="_blank" rel="noopener">linkedin.com/in/chancealage</a>
+    <a class="btn" href="https://github.com/Chizance" target="_blank" rel="noopener">github.com/Chizance</a>
+  </div>
+  <div class="foot">
+    <span>Chance Lage · San Francisco Bay Area</span>
+    <span>S3 · CloudFront · Route 53 · ACM</span>
+  </div>
+</div></footer>
+
+</body>
+</html>

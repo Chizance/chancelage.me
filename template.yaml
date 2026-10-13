@@ -1,0 +1,320 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  chancelage.me portfolio site. Private S3 origin, CloudFront with Origin
+  Access Control, ACM certificate, Route 53 alias records. Deploy this stack
+  in us-east-1 only: CloudFront can only use ACM certificates that live there.
+
+# ---------------------------------------------------------------------------
+# PARAMETERS
+# The two things that change between deployments. Everything else is derived.
+# ---------------------------------------------------------------------------
+Parameters:
+  DomainName:
+    Type: String
+    Default: chancelage.me
+    Description: Apex domain. The www version is added automatically.
+    AllowedPattern: '^[a-z0-9.-]+\.[a-z]{2,}$'
+
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: >
+      The Route 53 hosted zone for DomainName. Route 53 creates this for you
+      when it registers the domain. We need it so ACM can write its DNS
+      validation records and so we can create the alias records at the end.
+
+# ---------------------------------------------------------------------------
+# RESOURCES
+# Read top to bottom: bucket, then who can read it, then the certificate,
+# then the CDN in front of it, then DNS pointing at the CDN.
+# ---------------------------------------------------------------------------
+Resources:
+
+  # -- 1. The bucket that holds index.html ---------------------------------
+  # Fully private. No website hosting mode, no public ACLs, nothing reachable
+  # by URL. CloudFront is the only thing allowed to read it, and only because
+  # the bucket policy further down says so.
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain          # deleting the stack will not delete your files
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Ref DomainName   # naming it after the domain is convention, not required
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced   # disables ACLs entirely; modern default
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256                 # free S3-managed encryption at rest
+      VersioningConfiguration:
+        Status: Enabled               # lets you roll back a bad upload; costs pennies
+
+  # -- 2. Origin Access Control -------------------------------------------
+  # This is the modern replacement for Origin Access Identity. It makes
+  # CloudFront sign every request to S3 with SigV4, so S3 can verify the
+  # request really came from your distribution and not from someone who
+  # guessed the bucket name.
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${DomainName}-oac"
+        Description: !Sub "Signed access from CloudFront to the ${DomainName} bucket"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # -- 3. The TLS certificate ---------------------------------------------
+  # Free from ACM. Covers the apex and www. Validation is by DNS: because we
+  # hand ACM the HostedZoneId, CloudFormation writes the validation CNAMEs
+  # into Route 53 itself and waits for ACM to issue. No manual step.
+  # This is why the stack must be in us-east-1.
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub "www.${DomainName}"
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+        - DomainName: !Sub "www.${DomainName}"
+          HostedZoneId: !Ref HostedZoneId
+
+  # -- 4. A tiny edge function: send www to the apex ----------------------
+  # Runs at CloudFront's edge on every request, in microseconds. If someone
+  # types www.chancelage.me it 301s them to chancelage.me so there is
+  # exactly one canonical URL. Search engines and link previews prefer that.
+  WwwRedirectFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub
+        - "${Safe}-www-redirect"
+        - Safe: !Join ["-", !Split [".", !Ref DomainName]]
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Redirect www to apex
+        Runtime: cloudfront-js-2.0
+      FunctionCode: !Sub |
+        function handler(event) {
+          var request = event.request;
+          var host = request.headers.host.value;
+          if (host === 'www.${DomainName}') {
+            return {
+              statusCode: 301,
+              statusDescription: 'Moved Permanently',
+              headers: { location: { value: 'https://${DomainName}' + request.uri } }
+            };
+          }
+          return request;
+        }
+
+  # -- 4b. Response headers policy ----------------------------------------
+  # The AWS managed SecurityHeadersPolicy covers HSTS, nosniff, frame-deny and
+  # referrer policy, but it does NOT set a Content-Security-Policy. This page
+  # loads no scripts, no fonts and no third-party anything, so we can lock it
+  # down about as hard as a web page can be locked down and still render.
+  SecurityHeaders:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub
+          - "${Safe}-security-headers"
+          - Safe: !Join ["-", !Split [".", !Ref DomainName]]
+        Comment: Strict headers for a static, script-free site
+        SecurityHeadersConfig:
+          # Tells browsers to only ever reach this host over HTTPS, for two
+          # years, including any future subdomain. Kills SSL-strip downgrades.
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 63072000
+            IncludeSubdomains: true
+            Preload: true
+            Override: true
+          # Refuse to render inside anyone else's iframe (clickjacking).
+          FrameOptions:
+            FrameOption: DENY
+            Override: true
+          # Never let a browser guess a file's type from its bytes. Stops a
+          # mislabelled upload being executed as script.
+          ContentTypeOptions:
+            Override: true
+          # Send the full URL to ourselves, only the origin cross-site, and
+          # nothing at all when downgrading to HTTP.
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+          # The allow-list. default-src 'none' means "block everything that is
+          # not explicitly permitted below", which is the safe default almost
+          # nobody uses because most sites cannot survive it. This one can:
+          #   style-src  inline <style> blocks and one style="" attribute
+          #   img-src    self plus the data: URI favicon
+          #   everything else stays denied, including all script execution
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: >-
+              default-src 'none';
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' data:;
+              base-uri 'none';
+              form-action 'none';
+              frame-ancestors 'none';
+              object-src 'none';
+              upgrade-insecure-requests
+            Override: true
+        CustomHeadersConfig:
+          Items:
+            # Turn off browser features this page has no business using. If
+            # the page is ever compromised, it still cannot reach a camera,
+            # a microphone, or a location.
+            - Header: Permissions-Policy
+              Value: "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()"
+              Override: true
+            # Isolate this origin from other tabs and windows.
+            - Header: Cross-Origin-Opener-Policy
+              Value: same-origin
+              Override: true
+            - Header: Cross-Origin-Resource-Policy
+              Value: same-origin
+              Override: true
+
+  # -- 5. CloudFront distribution -----------------------------------------
+  # The CDN. Terminates TLS with the ACM cert, caches at edge locations,
+  # compresses responses, adds security headers, and fetches from S3 through
+  # the OAC above. Everything a visitor touches goes through here.
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub "${DomainName} portfolio"
+        Aliases:
+          - !Ref DomainName
+          - !Sub "www.${DomainName}"
+        DefaultRootObject: index.html          # so the bare domain serves the page
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: PriceClass_100             # North America + Europe edges only; cheapest tier
+        Origins:
+          - Id: s3-origin
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""         # must be empty when using OAC
+        DefaultCacheBehavior:
+          TargetOriginId: s3-origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          # AWS managed policies, referenced by their fixed IDs:
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6          # CachingOptimized
+          ResponseHeadersPolicyId: !Ref SecurityHeaders
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt WwwRedirectFunction.FunctionARN
+        ViewerCertificate:
+          AcmCertificateArn: !Ref Certificate
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        # S3 returns 403, not 404, for a missing object when the bucket is
+        # private. Translate that into a real 404 page so a typo in the URL
+        # does not show visitors an AWS access-denied XML blob.
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 60
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 60
+
+  # -- 6. Bucket policy: only this distribution may read ------------------
+  # Defined after the distribution because it needs the distribution's ARN.
+  # The Condition is the important line: without it, any CloudFront
+  # distribution in any AWS account could be pointed at your bucket.
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipalReadOnly
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${SiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}"
+
+  # -- 7. DNS: point the domain at CloudFront -----------------------------
+  # Alias records, not CNAMEs. A CNAME is not allowed at the apex of a zone
+  # (chancelage.me itself), and alias queries to AWS resources are free.
+  # Z2FDTNDATAQYW2 is the fixed hosted zone ID that AWS uses for every
+  # CloudFront distribution everywhere. It is not a typo and never changes.
+  ApexRecordA:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt Distribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+        EvaluateTargetHealth: false
+
+  ApexRecordAAAA:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: AAAA
+      AliasTarget:
+        DNSName: !GetAtt Distribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+        EvaluateTargetHealth: false
+
+  WwwRecordA:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "www.${DomainName}"
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt Distribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+        EvaluateTargetHealth: false
+
+  WwwRecordAAAA:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "www.${DomainName}"
+      Type: AAAA
+      AliasTarget:
+        DNSName: !GetAtt Distribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+        EvaluateTargetHealth: false
+
+# ---------------------------------------------------------------------------
+# OUTPUTS
+# Printed after deploy. The upload and invalidation commands need these.
+# ---------------------------------------------------------------------------
+Outputs:
+  SiteURL:
+    Value: !Sub "https://${DomainName}"
+  BucketName:
+    Value: !Ref SiteBucket
+  DistributionId:
+    Value: !Ref Distribution
+  DistributionDomain:
+    Description: The raw CloudFront hostname. Useful for testing before DNS settles.
+    Value: !GetAtt Distribution.DomainName

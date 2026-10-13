@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# If you would rather your resume PDF not be indexed by search engines,
+# uncomment the next line and re-upload this file.
+# Disallow: /resume.pdf
+
+Sitemap: https://chancelage.me/sitemap.xml
