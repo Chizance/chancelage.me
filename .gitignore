@@ -1,0 +1,7 @@
+# NEVER commit this. It holds the ICANN registrant record for the domain,
+# including a real street address and postal code.
+contact.json
+
+# Local noise
+.DS_Store
+*.swp
